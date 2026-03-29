@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>daechan kim design</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header id="site-header">
+      <a href="index.html" class="logo">daechan kim design</a>
+      <nav class="main-nav">
+        <button id="nav-about">about</button>
+        <button id="nav-contact">contact</button>
+      </nav>
+    </header>
+
+    <!-- Expanded Nav Overlay -->
+    <section id="expanded-nav" class="hidden">
+      <div class="expanded-container">
+        <!-- Left: Profile Image -->
+        <div class="profile-col">
+          <img src="assets/images/profile.png" alt="Daechan Kim Profile" class="profile-img">
+        </div>
+        
+        <!-- Center: Name Anchor -->
+        <div class="name-col">
+          <span class="name-bold">Daechan Kim</span>
+        </div>
+
+        <!-- Right: Targeted Content Area -->
+        <div class="content-col">
+          <nav class="sub-nav">
+            <div class="sub-nav-links">
+              <button class="sub-nav-btn active" data-target="bio">bio</button>
+              <button class="sub-nav-btn" data-target="background">background</button>
+              <button class="sub-nav-btn" data-target="contact">contact</button>
+            </div>
+            <a href="assets/pdf/daechankim_resume.pdf" class="resume-link" target="_blank">resume &darr;</a>
+          </nav>
+
+          <div class="content-body">
+            <!-- Bio Content -->
+            <div id="content-bio" class="tab-content active">
+              <p>Daechan Kim is a multidisciplinary designer who creates products with intentional interactions that
+                enrich everyday experiences.</p>
+              <p>Originally from South Korea and formally trained in the United States as an industrial designer, he
+                expresses a unique balance of subtlety and clarity through honest materiality and communicative form.
+              </p>
+              <p>Grounded in a close observation of human behavior, his practice extends across product, service, and
+                experience design to distill complexity into clear, intuitive forms.</p>
+              <p>Approaching design as a foundational language, he creates objects that genuinely invite interaction,
+                bringing function, human perception, and emotion into quiet alignment in object.</p>
+            </div>
+            <!-- Background Content -->
+            <div id="content-background" class="tab-content">
+              <p><span class="label-tag">education</span>
+              M.S. Experience Design at Northeastern University<br>
+              B.F.A Industrial Design at Rochester Institute of Technology</p>
+              
+              <p><span class="label-tag">experience</span>
+              Design Intern | Other Tomorrows<br>
+              Designer | Josh Owen LLC</p>
+              
+              <p><span class="label-tag">recognitions</span>
+              RIT’s Distinctive Collections | RIT Archive Collection (2024)</p>
+            </div>
+            <!-- Contact Content -->
+            <div id="content-contact" class="tab-content">
+              <p><span class="label-tag">email</span>
+              <a href="mailto:daechankim.design@gmail.com" class="contact-link">daechankim.design@gmail.com</a></p>
+              
+              <p><span class="label-tag">mobile</span>
+              <a href="tel:+15854045956" class="contact-link">+1 585 404 5956</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content: Scrollytelling Sequence -->
+    <main id="gallery-container">
+      <div class="gallery-wrapper">
+        <div class="image-container">
+          <!-- src is dynamically updated -->
+          <img id="main-image" src="assets/images/sequence/low_SIT_01.png" alt="Gallery Image">
+        </div>
+        <div class="project-info">
+          <a href="assets/pdf/31_stool_details.pdf" target="_blank" class="project-title-link">31 stool (2025)</a>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+
+</html>

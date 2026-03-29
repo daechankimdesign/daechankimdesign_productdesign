@@ -1,0 +1,362 @@
+:root {
+  --color-bg: #ffffff;
+  --color-text: #1a1a1a;
+  --font-main: 'Inter', sans-serif;
+  --header-height: 55px;
+  --padding-x: 20px;
+  --padding-y: 20px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-main);
+  /* Prevent default browser scrolling entirely to build our own engine */
+  overflow: hidden; 
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  animation: pageLoadFade 0.6s ease forwards;
+}
+
+@keyframes pageLoadFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+#app {
+  width: 100%;
+  height: 100%; /* Fill viewport */
+  position: relative;
+}
+
+/* Typography Base */
+a.resume-link, a.project-title-link {
+  font-family: var(--font-main);
+  font-style: italic;
+  text-decoration: underline;
+  font-size: 12px;
+  color: var(--color-text);
+  line-height: 1.5;
+  text-underline-offset: 4px;
+}
+
+a { 
+  text-decoration: none; 
+  color: inherit; 
+}
+
+/* Header */
+#site-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 100;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: lowercase;
+  transition: opacity 0.3s ease;
+}
+
+.main-nav {
+  display: flex;
+  gap: 20px;
+}
+
+.main-nav button {
+  background: none;
+  border: none;
+  font-family: var(--font-main);
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  padding: 0;
+}
+
+/* State Classes for Header Elements */
+.logo.faded, .main-nav button.faded {
+  opacity: 0.2;
+}
+
+/* Main Gallery */
+#gallery-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+.gallery-wrapper {
+  position: relative;
+  /* Native bounding constraint allowing image to center independently */
+}
+
+.image-container {
+  /* Dimensions derived closely from figma: 720x720 */
+  width: 720px;
+  height: 720px;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background: transparent;
+}
+
+#main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Ensure the image fits entirely to maintain its designed ratio */
+  transition: opacity 0.4s ease;
+}
+
+.project-info {
+  position: absolute;
+  top: calc(100% + 40px); /* Strictly locks 40px beneath the image boundary globally */
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  width: max-content;
+}
+
+#expanded-nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--color-bg); 
+  z-index: 50;
+  opacity: 1;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#expanded-nav.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.expanded-container {
+  position: absolute;
+  top: calc(50% - 140px); /* Locks the element from the top, ~140px above center offsets the layout cleanly without jittering on content swap */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 800px;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 200px 100px 1fr;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.profile-col {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.profile-img {
+  width: 200px; 
+  height: 200px;
+  object-fit: cover;
+}
+
+.content-col {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.name-col {
+  padding-top: 1px; /* Optical baseline alignment with nav font */
+}
+
+/* Base Body Anchor Links */
+.contact-link {
+  color: var(--color-text);
+  text-decoration: underline;
+  transition: opacity 0.3s ease;
+}
+
+.contact-link:hover {
+  opacity: 0.5;
+}
+
+.name-bold {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.sub-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 24px; /* Gap mimicking the design reference between nav and body text */
+}
+
+.sub-nav-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.sub-nav-btn {
+  background: none;
+  border: none;
+  font-family: var(--font-main);
+  font-size: 14px;
+  color: var(--color-text);
+  cursor: pointer;
+  opacity: 0.2; 
+  transition: opacity 0.3s ease;
+}
+
+.sub-nav-btn.active {
+  opacity: 1;
+}
+
+.sub-nav-btn:hover {
+  opacity: 1;
+}
+
+.content-body {
+  position: relative;
+  min-height: 280px; /* Enforces a stable height lock so visual proportions do not collapse when swapping to shorter tabs */
+}
+
+.tab-content {
+  display: none;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.tab-content p {
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.label-tag {
+  display: block;
+  font-size: 10px; /* Distinctly smaller than body text hierarchy per request */
+  margin-bottom: 2px;
+}
+
+.tab-content p:last-child {
+  margin-bottom: 0;
+}
+
+.contact-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+  gap: 4px;
+}
+
+.contact-label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.contact-value {
+  font-size: 14px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Precision Mobile Breakpoint */
+@media (max-width: 740px) {
+  .logo {
+    display: block;
+    max-width: 120px;
+    line-height: 1.2;
+  }
+
+  .expanded-container {
+    display: flex;
+    flex-direction: column;
+    top: 100px;
+    left: 0;
+    transform: none;
+    height: calc(100vh - 100px);
+    width: 100%;
+    padding: 0 20px;
+    gap: 20px;
+  }
+
+  .profile-col {
+    justify-content: flex-start;
+  }
+
+  .profile-img {
+    width: 140px;
+    height: 140px;
+  }
+
+  .name-col {
+    display: block; 
+    padding-top: 0;
+  }
+
+  .content-col {
+    flex: 1; 
+    min-height: 0; /* Crucial for Safari rendering of scrollable nested flex components */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Fully prevents the iOS flex infinite expansion scroll bug */
+  }
+
+  .sub-nav {
+    margin-bottom: 20px;
+    flex-wrap: wrap; 
+  }
+
+  .sub-nav-links {
+    gap: 12px;
+  }
+
+  .content-body {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 60px; /* Cushioning text from the physical screen bezel */
+    min-height: auto; 
+    -webkit-overflow-scrolling: touch; /* Forces hardware acceleration on iOS scroll */
+    scrollbar-width: none; /* Hide scrollbar tracking natively */
+  }
+  
+  .content-body::-webkit-scrollbar {
+    display: none; 
+  }
+}
