@@ -12,8 +12,6 @@ const DOM = {
   btnContact: document.getElementById('nav-contact'),
   expandedNav: document.getElementById('expanded-nav'),
   mainImage: document.getElementById('main-image'),
-  profileImg: document.querySelector('.profile-img'),
-  contentBody: document.querySelector('.content-body'),
   subBtns: document.querySelectorAll('.sub-nav-btn'),
   tabs: document.querySelectorAll('.tab-content')
 };
@@ -249,7 +247,6 @@ const TOUCH_SENSITIVITY = 60; // Hyper-responsive threshold for tiny physical mo
 // Wheel Event Interception
 window.addEventListener('wheel', (e) => {
   resetAutoplay(); // Pause auto-scrolling the exact moment a trackpad engagement is detected
-  if (state.isNavExpanded && e.target.closest('.content-body')) return; // Allow raw OS scrolling to flow dynamically over text boundaries natively
   e.preventDefault(); // Universally trap native scrolling mechanism
   scrollAccumulator += e.deltaY;
   
@@ -276,8 +273,8 @@ window.addEventListener('touchstart', (e) => {
 
 window.addEventListener('touchmove', (e) => {
   resetAutoplay(); // Halt sequence auto-play upon physical finger engagement 
-  if (state.isNavExpanded && e.target.closest('.content-body')) return; // Native os-level scrolling priority for dynamic UI expansion
   e.preventDefault(); // Universally trap native mobile swiping for sequence framework
+  
   const touchEndY = e.touches[0].clientY;
   const diff = touchStartY - touchEndY;
   touchStartY = touchEndY;
@@ -315,17 +312,3 @@ function resetAutoplay() {
 
 // Kickstart engine on bootstrap
 startAutoplay();
-
-// --- Mobile Dynamic UI Scaling ---
-DOM.contentBody.addEventListener('scroll', () => {
-  if (window.innerWidth <= 740) {
-    if (DOM.contentBody.scrollTop > 5) { // 5px threshold for hyper reactivity 
-      DOM.profileImg.classList.add('scrolled');
-    } else {
-      DOM.profileImg.classList.remove('scrolled');
-    }
-  } else {
-    // Reset immediately if window expands past mobile limits unexpectedly
-    DOM.profileImg.classList.remove('scrolled'); 
-  }
-});

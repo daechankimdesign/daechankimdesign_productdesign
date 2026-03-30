@@ -193,7 +193,6 @@ a {
   width: 200px;
   height: 200px;
   object-fit: cover;
-  transition: width 0.3s ease, height 0.3s ease;
 }
 
 .content-col {
@@ -343,13 +342,8 @@ a {
   }
 
   .profile-img {
-    width: 120px;
-    height: 120px;
-  }
-
-  .profile-img.scrolled {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
   }
 
   .name-col {
@@ -378,17 +372,9 @@ a {
 
   .content-body {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: hidden;
     padding-bottom: 60px;
     /* Cushioning text from the physical screen bezel */
     min-height: 0;
-    -webkit-overflow-scrolling: touch;
-    /* Forces hardware acceleration on iOS scroll */
-    scrollbar-width: none;
-    /* Hide scrollbar tracking natively */
-  }
-
-  .content-body::-webkit-scrollbar {
-    display: none;
   }
 }
