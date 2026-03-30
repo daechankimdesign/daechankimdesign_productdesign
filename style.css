@@ -193,6 +193,7 @@ a {
   width: 200px;
   height: 200px;
   object-fit: cover;
+  transition: width 0.3s ease, height 0.3s ease;
 }
 
 .content-col {
@@ -346,6 +347,11 @@ a {
     height: 120px;
   }
 
+  .profile-img.scrolled {
+    width: 80px;
+    height: 80px;
+  }
+
   .name-col {
     display: block;
     padding-top: 0;
@@ -375,7 +381,7 @@ a {
     overflow-y: auto;
     padding-bottom: 60px;
     /* Cushioning text from the physical screen bezel */
-    min-height: auto;
+    min-height: 0;
     -webkit-overflow-scrolling: touch;
     /* Forces hardware acceleration on iOS scroll */
     scrollbar-width: none;
