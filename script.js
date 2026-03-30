@@ -188,6 +188,25 @@ function changeTab(tabName) {
   });
 }
 
+// --- Tap to Translate Bio ---
+const bioContainer = document.getElementById('content-bio');
+const bioEn = bioContainer.querySelector('.bio-en');
+const bioKr = bioContainer.querySelector('.bio-kr');
+const bioBtn = document.querySelector('.sub-nav-btn[data-target="bio"]');
+
+bioContainer.addEventListener('click', () => {
+  // Swap bi-lingual states cleanly
+  if (bioEn.classList.contains('active')) {
+    bioEn.classList.remove('active');
+    bioKr.classList.add('active');
+    bioBtn.textContent = 'bio (KR)';
+  } else {
+    bioKr.classList.remove('active');
+    bioEn.classList.add('active');
+    bioBtn.textContent = 'bio';
+  }
+});
+
 // --- Dynamic Scrollytelling Engine ---
 
 function handleTabHop(direction) {

@@ -22,6 +22,7 @@ body {
   font-family: var(--font-main);
   /* Prevent default browser scrolling entirely to build our own engine */
   overflow: hidden;
+  touch-action: none; /* Strip OS-level touch absorption completely */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   animation: pageLoadFade 0.6s ease forwards;
@@ -262,6 +263,16 @@ a {
   /* Enforces a stable height lock so visual proportions do not collapse when swapping to shorter tabs */
 }
 
+/* Bi-Lingual Tap Toggle States */
+.bio-lang {
+  display: none;
+}
+
+.bio-lang.active {
+  display: block;
+  animation: fadeIn 0.4s ease forwards;
+}
+
 .tab-content {
   display: none;
   font-size: 14px;
@@ -376,5 +387,6 @@ a {
     padding-bottom: 60px;
     /* Cushioning text from the physical screen bezel */
     min-height: 0;
+    touch-action: none; /* Guarantee browser text-pan logic yields to raw swiping */
   }
 }
