@@ -64,6 +64,7 @@ loadHighResImage(state.galleryIndex);
 // --- Header Navigation ---
 
 function toggleExpandedNav(targetTab) {
+  resetAutoplay(); // Immediately halt and reset the 5s timer if a user interfaces with overlays
   state.isNavExpanded = !state.isNavExpanded;
 
   if (state.isNavExpanded) {
@@ -241,9 +242,11 @@ function handleScroll(direction) {
 
 let scrollAccumulator = 0;
 const SCROLL_SENSITIVITY = 400; // Pixel threshold to snap to sequence frames natively
+const TOUCH_SENSITIVITY = 150; // Specifically lowered threshold for physical mobile swiping distances
 
 // Wheel Event Interception
 window.addEventListener('wheel', (e) => {
+  resetAutoplay(); // Pause auto-scrolling the exact moment a trackpad engagement is detected
   e.preventDefault(); // Universally trap native scrolling mechanism
   scrollAccumulator += e.deltaY;
   
@@ -265,19 +268,20 @@ let touchAccumulator = 0;
 
 window.addEventListener('touchstart', (e) => {
   touchStartY = e.touches[0].clientY;
-  touchAccumulator = 0;
+  // Important: We NO LONGER reset touchAccumulator to 0 here to allow multiple short finger swipes to pool up to 150px
 }, { passive: false });
 
 window.addEventListener('touchmove', (e) => {
-  e.preventDefault(); // Universally trap native mobile swiping
+  resetAutoplay(); // Halt sequence auto-play upon physical finger engagement 
+  e.preventDefault(); // Universally trap native mobile swiping for sequence framework
   const touchEndY = e.touches[0].clientY;
   const diff = touchStartY - touchEndY;
   touchStartY = touchEndY;
 
   touchAccumulator += diff;
-  if (Math.abs(touchAccumulator) >= SCROLL_SENSITIVITY) {
-    const framesToMove = Math.sign(touchAccumulator) * Math.floor(Math.abs(touchAccumulator) / SCROLL_SENSITIVITY);
-    touchAccumulator = touchAccumulator % SCROLL_SENSITIVITY;
+  if (Math.abs(touchAccumulator) >= TOUCH_SENSITIVITY) {
+    const framesToMove = Math.sign(touchAccumulator) * Math.floor(Math.abs(touchAccumulator) / TOUCH_SENSITIVITY);
+    touchAccumulator = touchAccumulator % TOUCH_SENSITIVITY;
     
     if (state.isNavExpanded) {
       handleTabHop(framesToMove);
@@ -286,3 +290,24 @@ window.addEventListener('touchmove', (e) => {
     }
   }
 }, { passive: false });
+
+// --- Auto-play Engine ---
+let autoplayTimer = null;
+const AUTOPLAY_INTERVAL = 5000;
+
+function startAutoplay() {
+  if (autoplayTimer) clearInterval(autoplayTimer);
+  autoplayTimer = setInterval(() => {
+    // Only automatically advance if the gallery is physically visible and idle
+    if (!state.isNavExpanded && !state.isScrolling) {
+      handleScroll(1); // Scrub one discrete frame forward
+    }
+  }, AUTOPLAY_INTERVAL);
+}
+
+function resetAutoplay() {
+  startAutoplay();
+}
+
+// Kickstart engine on bootstrap
+startAutoplay();

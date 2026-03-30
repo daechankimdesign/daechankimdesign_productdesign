@@ -13,32 +13,40 @@
   padding: 0;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   background-color: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-main);
   /* Prevent default browser scrolling entirely to build our own engine */
-  overflow: hidden; 
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   animation: pageLoadFade 0.6s ease forwards;
 }
 
 @keyframes pageLoadFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 #app {
   width: 100%;
-  height: 100%; /* Fill viewport */
+  height: 100%;
+  /* Fill viewport */
   position: relative;
 }
 
 /* Typography Base */
-a.resume-link, a.project-title-link {
+a.resume-link,
+a.project-title-link {
   font-family: var(--font-main);
   font-style: italic;
   text-decoration: underline;
@@ -48,9 +56,9 @@ a.resume-link, a.project-title-link {
   text-underline-offset: 4px;
 }
 
-a { 
-  text-decoration: none; 
-  color: inherit; 
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
 /* Header */
@@ -70,6 +78,8 @@ a {
   font-weight: 700;
   font-size: 12px;
   text-transform: lowercase;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
   transition: opacity 0.3s ease;
 }
 
@@ -91,7 +101,8 @@ a {
 }
 
 /* State Classes for Header Elements */
-.logo.faded, .main-nav button.faded {
+.logo.faded,
+.main-nav button.faded {
   opacity: 0.2;
 }
 
@@ -109,16 +120,15 @@ a {
 }
 
 .gallery-wrapper {
-  position: relative;
-  /* Native bounding constraint allowing image to center independently */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .image-container {
-  /* Dimensions derived closely from figma: 720x720 */
-  width: 720px;
-  height: 720px;
-  max-width: 90vw;
-  max-height: 90vh;
+  /* Dimensions derived closely from figma: Perfectly Square natively */
+  width: min(720px, 90vw, calc(100vh - 160px));
+  height: min(720px, 90vw, calc(100vh - 160px));
   display: flex;
   justify-content: center;
   align-items: center;
@@ -129,15 +139,14 @@ a {
 #main-image {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Ensure the image fits entirely to maintain its designed ratio */
+  object-fit: contain;
+  /* Ensure the image fits entirely to maintain its designed ratio */
   transition: opacity 0.4s ease;
 }
 
 .project-info {
-  position: absolute;
-  top: calc(100% + 40px); /* Strictly locks 40px beneath the image boundary globally */
-  left: 50%;
-  transform: translateX(-50%);
+  margin-top: 20px;
+  /* Tightly locks exactly 40px below the rendered image wrapper inside the flex layout natively without calculation bugs */
   text-align: center;
   width: max-content;
 }
@@ -148,7 +157,7 @@ a {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: var(--color-bg); 
+  background-color: var(--color-bg);
   z-index: 50;
   opacity: 1;
   transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -162,7 +171,8 @@ a {
 
 .expanded-container {
   position: absolute;
-  top: calc(50% - 140px); /* Locks the element from the top, ~140px above center offsets the layout cleanly without jittering on content swap */
+  top: calc(50% - 140px);
+  /* Locks the element from the top, ~140px above center offsets the layout cleanly without jittering on content swap */
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
@@ -180,7 +190,7 @@ a {
 }
 
 .profile-img {
-  width: 200px; 
+  width: 200px;
   height: 200px;
   object-fit: cover;
 }
@@ -192,7 +202,8 @@ a {
 }
 
 .name-col {
-  padding-top: 1px; /* Optical baseline alignment with nav font */
+  padding-top: 1px;
+  /* Optical baseline alignment with nav font */
 }
 
 /* Base Body Anchor Links */
@@ -216,7 +227,8 @@ a {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-bottom: 24px; /* Gap mimicking the design reference between nav and body text */
+  margin-bottom: 24px;
+  /* Gap mimicking the design reference between nav and body text */
 }
 
 .sub-nav-links {
@@ -232,7 +244,7 @@ a {
   font-size: 14px;
   color: var(--color-text);
   cursor: pointer;
-  opacity: 0.2; 
+  opacity: 0.2;
   transition: opacity 0.3s ease;
 }
 
@@ -246,7 +258,8 @@ a {
 
 .content-body {
   position: relative;
-  min-height: 280px; /* Enforces a stable height lock so visual proportions do not collapse when swapping to shorter tabs */
+  min-height: 280px;
+  /* Enforces a stable height lock so visual proportions do not collapse when swapping to shorter tabs */
 }
 
 .tab-content {
@@ -267,7 +280,8 @@ a {
 
 .label-tag {
   display: block;
-  font-size: 10px; /* Distinctly smaller than body text hierarchy per request */
+  font-size: 10px;
+  /* Distinctly smaller than body text hierarchy per request */
   margin-bottom: 2px;
 }
 
@@ -292,8 +306,15 @@ a {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(3px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Precision Mobile Breakpoint */
@@ -301,7 +322,7 @@ a {
   .logo {
     display: block;
     max-width: 120px;
-    line-height: 1.2;
+    line-height: 1.1;
   }
 
   .expanded-container {
@@ -321,26 +342,28 @@ a {
   }
 
   .profile-img {
-    width: 140px;
-    height: 140px;
+    width: 120px;
+    height: 120px;
   }
 
   .name-col {
-    display: block; 
+    display: block;
     padding-top: 0;
   }
 
   .content-col {
-    flex: 1; 
-    min-height: 0; /* Crucial for Safari rendering of scrollable nested flex components */
+    flex: 1;
+    min-height: 0;
+    /* Crucial for Safari rendering of scrollable nested flex components */
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Fully prevents the iOS flex infinite expansion scroll bug */
+    overflow: hidden;
+    /* Fully prevents the iOS flex infinite expansion scroll bug */
   }
 
   .sub-nav {
     margin-bottom: 20px;
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
   }
 
   .sub-nav-links {
@@ -350,13 +373,16 @@ a {
   .content-body {
     flex: 1;
     overflow-y: auto;
-    padding-bottom: 60px; /* Cushioning text from the physical screen bezel */
-    min-height: auto; 
-    -webkit-overflow-scrolling: touch; /* Forces hardware acceleration on iOS scroll */
-    scrollbar-width: none; /* Hide scrollbar tracking natively */
+    padding-bottom: 60px;
+    /* Cushioning text from the physical screen bezel */
+    min-height: auto;
+    -webkit-overflow-scrolling: touch;
+    /* Forces hardware acceleration on iOS scroll */
+    scrollbar-width: none;
+    /* Hide scrollbar tracking natively */
   }
-  
+
   .content-body::-webkit-scrollbar {
-    display: none; 
+    display: none;
   }
 }
