@@ -242,7 +242,7 @@ function handleScroll(direction) {
 
 let scrollAccumulator = 0;
 const SCROLL_SENSITIVITY = 400; // Pixel threshold to snap to sequence frames natively
-const TOUCH_SENSITIVITY = 150; // Specifically lowered threshold for physical mobile swiping distances
+const TOUCH_SENSITIVITY = 60; // Hyper-responsive threshold for tiny physical mobile swiping distances
 
 // Wheel Event Interception
 window.addEventListener('wheel', (e) => {
