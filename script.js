@@ -369,18 +369,26 @@ let lightboxIndex = 0;
 let isLightboxActive = false;
 
 function loadIntoLightbox(index) {
-  // Safari/Chrome naturally retain the previous `.src` image visually while uncompressed payloads take time resolving over the network.
-  // We explicitly override this by instantly mapping the hardware-cached `mid_` asset flawlessly eliminating the ghosting glitch.
-  const proxyCacheUrl = getMidResUrl(PROJECT_IMAGES[index]);
-  DOM.lightboxImage.src = proxyCacheUrl;
+  // 1. TIER 1 (INSTANT): The `low` resolution array is formally prefetched globally into RAM on page load.
+  // Assigning this absolutely guarantees the previous image is overwritten synchronously, terminating any glitch loops natively.
+  DOM.lightboxImage.src = preloadedLowResUrls[index];
   
-  // Asynchronously reconstruct the 2400px native uncompressed rendering payload
-  const nativeFetcher = new Image();
-  nativeFetcher.src = PROJECT_IMAGES[index];
-  nativeFetcher.onload = () => {
-    // Only commit the 2400px payload if the user specifically hasn't swiped away natively during the download phase
+  // 2. TIER 2 (GRADUAL): We asynchronously spawn the 1080px display proxy specifically to handle high-fidelity scaling natively.
+  const proxyFetcher = new Image();
+  proxyFetcher.src = getMidResUrl(PROJECT_IMAGES[index]);
+  proxyFetcher.onload = () => {
+    // Ensure user is still observing this exact frame mapping
     if (isLightboxActive && lightboxIndex === index) {
-      DOM.lightboxImage.src = nativeFetcher.src;
+      DOM.lightboxImage.src = proxyFetcher.src;
+      
+      // 3. TIER 3 (MAXIMUM): We cascade downwards aggressively fetching the 2400px ultra uncompressed dataset logically.
+      const nativeFetcher = new Image();
+      nativeFetcher.src = PROJECT_IMAGES[index];
+      nativeFetcher.onload = () => {
+        if (isLightboxActive && lightboxIndex === index) {
+          DOM.lightboxImage.src = nativeFetcher.src;
+        }
+      };
     }
   };
 }
@@ -399,7 +407,6 @@ function openLightbox(index) {
   // Reset CSS transform parameters
   DOM.lightboxImage.style.transform = '';
   DOM.lightboxImage.style.opacity = '';
-  DOM.lightboxOverlay.style.background = '';
   // Load array logically seamlessly
   loadIntoLightbox(lightboxIndex);
 
@@ -476,10 +483,6 @@ DOM.lightboxOverlay.addEventListener('touchmove', (e) => {
   
   // Track physically 1:1
   DOM.lightboxImage.style.transform = `translateY(${deltaY}px)`;
-  
-  // Apply a subtle visual fade to the overlay intuitively exposing the background UI natively
-  const fadeMath = Math.max(0.4, 1 - (Math.abs(deltaY) / window.innerHeight));
-  DOM.lightboxOverlay.style.background = `rgba(255, 255, 255, ${fadeMath})`;
 }, { passive: true });
 
 DOM.lightboxOverlay.addEventListener('touchend', (e) => {
@@ -501,7 +504,6 @@ DOM.lightboxOverlay.addEventListener('touchend', (e) => {
   } else {
     // Aborted: Elastic Rubberband seamlessly snaps to center baseline visually
     DOM.lightboxImage.style.transform = `translateY(0)`;
-    DOM.lightboxOverlay.style.background = `var(--color-bg)`;
   }
 }, { passive: true });
 
@@ -524,10 +526,30 @@ function executeSwipeAnimation(direction) {
       DOM.lightboxImage.classList.remove('dragging');
       DOM.lightboxImage.style.transform = `translateY(0px)`;
       DOM.lightboxImage.style.opacity = '1';
-      DOM.lightboxOverlay.style.background = `var(--color-bg)`;
     }, 20); // Paint-render loop synchronization timer natively
   }, 300); // Expiration interval matching our explicit CSS Cubic-Bezier animation limit natively
 }
+
+// Trackpad Native Scroll Fallback for Desktop Bounds
+DOM.lightboxOverlay.addEventListener('wheel', (e) => {
+  if (DOM.lightboxImage.classList.contains('zoomed') || !isLightboxActive) return; 
+
+  e.preventDefault(); 
+  
+  // Protect hardware architecture from high-frequency scrolling logs causing visual glitchez
+  if (DOM.lightboxOverlay.dataset.wheelLocked) return;
+
+  if (Math.abs(e.deltaY) > 20) { 
+    DOM.lightboxOverlay.dataset.wheelLocked = 'true';
+    if (e.deltaY > 0) {
+      executeSwipeAnimation(-1); // Match swiping UP natively against scroll array logic inherently
+    } else {
+      executeSwipeAnimation(1); 
+    }
+    // Strict timing interval bounds identical to visual map transitions natively
+    setTimeout(() => delete DOM.lightboxOverlay.dataset.wheelLocked, 800);
+  }
+}, { passive: false });
 
 // Desktop Keyboard Fallback
 window.addEventListener('keydown', (e) => {

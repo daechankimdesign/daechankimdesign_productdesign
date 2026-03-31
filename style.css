@@ -494,8 +494,7 @@ body.lightbox-active {
 }
 
 #lightbox-image.zoomed {
-  /* Releases CSS scaling bounds allowing the natural 2400px resolution payload to burst natively into overflow-scroll */
-  max-width: none;
-  max-height: none;
+  max-width: 150vw; /* Override basic sizing gracefully providing zoom */
+  max-height: 150vh;
   cursor: zoom-out;
 }
