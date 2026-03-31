@@ -426,14 +426,23 @@ body.lightbox-active {
   cursor: pointer;
   z-index: 10000;
   padding: 20px;
-  opacity: 0.5;
-  transition: opacity 0.2s ease;
 }
 
-#lightbox-close:hover,
-#lightbox-prev:hover,
-#lightbox-next:hover {
+/* Visibility Timing Matrices */
+#lightbox-overlay .lightbox-nav {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease; /* Deep fade for elegance */
+}
+
+#lightbox-overlay.show-buttons .lightbox-nav {
+  opacity: 0.5;
+  pointer-events: auto;
+}
+
+#lightbox-overlay.show-buttons .lightbox-nav:hover {
   opacity: 1;
+  transition: opacity 0.2s ease; /* Rapid hover state */
 }
 
 #lightbox-close {

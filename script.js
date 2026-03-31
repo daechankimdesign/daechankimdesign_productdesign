@@ -383,12 +383,20 @@ function openLightbox(index) {
   DOM.lightboxImage.classList.remove('zoomed');
   // Pass the raw 2400x2400 master payload into the viewer dynamically
   DOM.lightboxImage.src = PROJECT_IMAGES[lightboxIndex];
+
+  // Stage graceful UI apparition via CSS bounds
+  setTimeout(() => {
+    if (isLightboxActive) {
+      DOM.lightboxOverlay.classList.add('show-buttons');
+    }
+  }, 300);
 }
 
 function closeLightbox() {
   isLightboxActive = false;
   document.body.classList.remove('lightbox-active');
   DOM.lightboxOverlay.classList.add('hidden');
+  DOM.lightboxOverlay.classList.remove('show-buttons'); // Clean out state parameters concurrently
   
   resetAutoplay(); // Safely resurrect page ecosystem
 }
@@ -421,30 +429,9 @@ DOM.lightboxImage.addEventListener('click', (e) => {
 
 // Overlay Exiting Physics
 DOM.lightboxOverlay.addEventListener('click', (e) => {
-  if (e.target === DOM.lightboxOverlay || e.target.id === 'lightbox-track') {
+  // If the target is NOT strictly the image bounds, and NOT securely a native UI button,
+  // we successfully evaluate it as an outside click dynamically.
+  if (e.target !== DOM.lightboxImage && !e.target.classList.contains('lightbox-nav')) {
     closeLightbox();
   }
 });
-
-// Mobile Native Swipe Navigation (Un-locked only when fully zoomed-out)
-let lbTouchStartX = 0;
-let lbTouchEndX = 0;
-
-DOM.lightboxOverlay.addEventListener('touchstart', (e) => {
-  if (DOM.lightboxImage.classList.contains('zoomed')) return; // Yield natively to Safari Panning matrix
-  lbTouchStartX = e.changedTouches[0].screenX;
-}, { passive: true });
-
-DOM.lightboxOverlay.addEventListener('touchend', (e) => {
-  if (DOM.lightboxImage.classList.contains('zoomed')) return; 
-  lbTouchEndX = e.changedTouches[0].screenX;
-  
-  const diff = lbTouchStartX - lbTouchEndX;
-  if (Math.abs(diff) > 50) { // Strict threshold prevents accidental jittering
-    if (diff > 0) {
-      changeLightboxImage(1); // Swipe Left = Next
-    } else {
-      changeLightboxImage(-1); // Swipe Right = Prev
-    }
-  }
-}, { passive: true });
