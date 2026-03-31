@@ -13,7 +13,12 @@ const DOM = {
   expandedNav: document.getElementById('expanded-nav'),
   mainImage: document.getElementById('main-image'),
   subBtns: document.querySelectorAll('.sub-nav-btn'),
-  tabs: document.querySelectorAll('.tab-content')
+  tabs: document.querySelectorAll('.tab-content'),
+  lightboxOverlay: document.getElementById('lightbox-overlay'),
+  lightboxImage: document.getElementById('lightbox-image'),
+  lightboxClose: document.getElementById('lightbox-close'),
+  lightboxPrev: document.getElementById('lightbox-prev'),
+  lightboxNext: document.getElementById('lightbox-next')
 };
 
 let state = {
@@ -46,8 +51,14 @@ PROJECT_IMAGES.forEach(hiResUrl => {
 });
 
 
+function getMidResUrl(hiResUrl) {
+  const parts = hiResUrl.split('/');
+  const filename = parts.pop();
+  return [...parts, `mid_${filename}`].join('/');
+}
+
 function loadHighResImage(index) {
-  const imgUrl = PROJECT_IMAGES[index];
+  const imgUrl = getMidResUrl(PROJECT_IMAGES[index]);
   const imgLoader = new Image();
   imgLoader.src = imgUrl;
   imgLoader.onload = () => {
@@ -265,6 +276,8 @@ const TOUCH_SENSITIVITY = 60; // Hyper-responsive threshold for tiny physical mo
 
 // Wheel Event Interception
 window.addEventListener('wheel', (e) => {
+  if (isLightboxActive) return; // Yield exclusively to native browser scrolling math
+
   resetAutoplay(); // Pause auto-scrolling the exact moment a trackpad engagement is detected
   e.preventDefault(); // Universally trap native scrolling mechanism
   scrollAccumulator += e.deltaY;
@@ -286,11 +299,14 @@ let touchStartY = 0;
 let touchAccumulator = 0;
 
 window.addEventListener('touchstart', (e) => {
+  if (isLightboxActive) return; // Release custom mechanics to natively scroll
   touchStartY = e.touches[0].clientY;
   // Important: We NO LONGER reset touchAccumulator to 0 here to allow multiple short finger swipes to pool up to 150px
 }, { passive: false });
 
 window.addEventListener('touchmove', (e) => {
+  if (isLightboxActive) return; // Yield touch tracking mapping back over to native iOS viewport scaling
+
   resetAutoplay(); // Halt sequence auto-play upon physical finger engagement 
   e.preventDefault(); // Universally trap native mobile swiping for sequence framework
   
@@ -331,3 +347,86 @@ function resetAutoplay() {
 
 // Kickstart engine on bootstrap
 startAutoplay();
+
+// --- Immersive Lightbox Engine ---
+let lightboxIndex = 0;
+let isLightboxActive = false;
+
+function openLightbox(index) {
+  isLightboxActive = true;
+  lightboxIndex = index;
+  
+  if (autoplayTimer) clearInterval(autoplayTimer); // Forceably suspend automated scrolling logic
+  
+  document.body.classList.add('lightbox-active');
+  DOM.lightboxOverlay.classList.remove('hidden');
+  
+  // Wipe zoomed state securely
+  DOM.lightboxImage.classList.remove('zoomed');
+  // Pass the raw 2400x2400 master payload into the viewer dynamically
+  DOM.lightboxImage.src = PROJECT_IMAGES[lightboxIndex];
+}
+
+function closeLightbox() {
+  isLightboxActive = false;
+  document.body.classList.remove('lightbox-active');
+  DOM.lightboxOverlay.classList.add('hidden');
+  
+  resetAutoplay(); // Safely resurrect page ecosystem
+}
+
+function changeLightboxImage(direction) {
+  lightboxIndex += direction;
+  // Cyclic bounds logic seamlessly looping bounds identically to scrub wheel mechanics
+  if (lightboxIndex < 0) lightboxIndex = PROJECT_IMAGES.length - 1;
+  if (lightboxIndex >= PROJECT_IMAGES.length) lightboxIndex = 0;
+  
+  DOM.lightboxImage.classList.remove('zoomed');
+  DOM.lightboxImage.src = PROJECT_IMAGES[lightboxIndex];
+}
+
+// Primary Trigger Logic Mapping natively
+DOM.mainImage.addEventListener('click', () => {
+  openLightbox(state.galleryIndex);
+});
+
+// Structural Navigation Matrix Mapping
+DOM.lightboxClose.addEventListener('click', closeLightbox);
+DOM.lightboxPrev.addEventListener('click', () => changeLightboxImage(-1));
+DOM.lightboxNext.addEventListener('click', () => changeLightboxImage(1));
+
+// Desktop & Mobile Native Zoom Toggles (Un-locking physical scrollbars constraints globally)
+DOM.lightboxImage.addEventListener('click', (e) => {
+  e.stopPropagation(); 
+  DOM.lightboxImage.classList.toggle('zoomed');
+});
+
+// Overlay Exiting Physics
+DOM.lightboxOverlay.addEventListener('click', (e) => {
+  if (e.target === DOM.lightboxOverlay || e.target.id === 'lightbox-track') {
+    closeLightbox();
+  }
+});
+
+// Mobile Native Swipe Navigation (Un-locked only when fully zoomed-out)
+let lbTouchStartX = 0;
+let lbTouchEndX = 0;
+
+DOM.lightboxOverlay.addEventListener('touchstart', (e) => {
+  if (DOM.lightboxImage.classList.contains('zoomed')) return; // Yield natively to Safari Panning matrix
+  lbTouchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+
+DOM.lightboxOverlay.addEventListener('touchend', (e) => {
+  if (DOM.lightboxImage.classList.contains('zoomed')) return; 
+  lbTouchEndX = e.changedTouches[0].screenX;
+  
+  const diff = lbTouchStartX - lbTouchEndX;
+  if (Math.abs(diff) > 50) { // Strict threshold prevents accidental jittering
+    if (diff > 0) {
+      changeLightboxImage(1); // Swipe Left = Next
+    } else {
+      changeLightboxImage(-1); // Swipe Right = Prev
+    }
+  }
+}, { passive: true });
