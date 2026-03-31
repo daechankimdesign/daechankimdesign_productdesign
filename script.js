@@ -16,9 +16,7 @@ const DOM = {
   tabs: document.querySelectorAll('.tab-content'),
   lightboxOverlay: document.getElementById('lightbox-overlay'),
   lightboxImage: document.getElementById('lightbox-image'),
-  lightboxClose: document.getElementById('lightbox-close'),
-  lightboxPrev: document.getElementById('lightbox-prev'),
-  lightboxNext: document.getElementById('lightbox-next')
+  lightboxClose: document.getElementById('lightbox-close')
 };
 
 let state = {
@@ -370,6 +368,23 @@ startAutoplay();
 let lightboxIndex = 0;
 let isLightboxActive = false;
 
+function loadIntoLightbox(index) {
+  // Safari/Chrome naturally retain the previous `.src` image visually while uncompressed payloads take time resolving over the network.
+  // We explicitly override this by instantly mapping the hardware-cached `mid_` asset flawlessly eliminating the ghosting glitch.
+  const proxyCacheUrl = getMidResUrl(PROJECT_IMAGES[index]);
+  DOM.lightboxImage.src = proxyCacheUrl;
+  
+  // Asynchronously reconstruct the 2400px native uncompressed rendering payload
+  const nativeFetcher = new Image();
+  nativeFetcher.src = PROJECT_IMAGES[index];
+  nativeFetcher.onload = () => {
+    // Only commit the 2400px payload if the user specifically hasn't swiped away natively during the download phase
+    if (isLightboxActive && lightboxIndex === index) {
+      DOM.lightboxImage.src = nativeFetcher.src;
+    }
+  };
+}
+
 function openLightbox(index) {
   isLightboxActive = true;
   lightboxIndex = index;
@@ -381,8 +396,12 @@ function openLightbox(index) {
   
   // Wipe zoomed state securely
   DOM.lightboxImage.classList.remove('zoomed');
-  // Pass the raw 2400x2400 master payload into the viewer dynamically
-  DOM.lightboxImage.src = PROJECT_IMAGES[lightboxIndex];
+  // Reset CSS transform parameters
+  DOM.lightboxImage.style.transform = '';
+  DOM.lightboxImage.style.opacity = '';
+  DOM.lightboxOverlay.style.background = '';
+  // Load array logically seamlessly
+  loadIntoLightbox(lightboxIndex);
 
   // Stage graceful UI apparition via CSS bounds
   setTimeout(() => {
@@ -408,7 +427,7 @@ function changeLightboxImage(direction) {
   if (lightboxIndex >= PROJECT_IMAGES.length) lightboxIndex = 0;
   
   DOM.lightboxImage.classList.remove('zoomed');
-  DOM.lightboxImage.src = PROJECT_IMAGES[lightboxIndex];
+  loadIntoLightbox(lightboxIndex);
 }
 
 // Primary Trigger Logic Mapping natively
@@ -418,8 +437,6 @@ DOM.mainImage.addEventListener('click', () => {
 
 // Structural Navigation Matrix Mapping
 DOM.lightboxClose.addEventListener('click', closeLightbox);
-DOM.lightboxPrev.addEventListener('click', () => changeLightboxImage(-1));
-DOM.lightboxNext.addEventListener('click', () => changeLightboxImage(1));
 
 // Desktop & Mobile Native Zoom Toggles (Un-locking physical scrollbars constraints globally)
 DOM.lightboxImage.addEventListener('click', (e) => {
@@ -434,4 +451,88 @@ DOM.lightboxOverlay.addEventListener('click', (e) => {
   if (e.target !== DOM.lightboxImage && !e.target.classList.contains('lightbox-nav')) {
     closeLightbox();
   }
+});
+
+// 1:1 Hardware Accelerated Vertical Drag Module
+let lbTouchStartY = 0;
+let lbCurrentY = 0;
+let isDraggingLightbox = false;
+
+DOM.lightboxOverlay.addEventListener('touchstart', (e) => {
+  if (DOM.lightboxImage.classList.contains('zoomed')) return; // Yield entirely to OS rendering loops
+  isDraggingLightbox = true;
+  lbTouchStartY = e.touches[0].clientY;
+  lbCurrentY = lbTouchStartY;
+  
+  // Snap the transition strings natively to execute zero-latency finger dragging
+  DOM.lightboxImage.classList.add('dragging');
+}, { passive: true });
+
+DOM.lightboxOverlay.addEventListener('touchmove', (e) => {
+  if (!isDraggingLightbox || DOM.lightboxImage.classList.contains('zoomed')) return;
+  
+  lbCurrentY = e.touches[0].clientY;
+  const deltaY = lbCurrentY - lbTouchStartY;
+  
+  // Track physically 1:1
+  DOM.lightboxImage.style.transform = `translateY(${deltaY}px)`;
+  
+  // Apply a subtle visual fade to the overlay intuitively exposing the background UI natively
+  const fadeMath = Math.max(0.4, 1 - (Math.abs(deltaY) / window.innerHeight));
+  DOM.lightboxOverlay.style.background = `rgba(255, 255, 255, ${fadeMath})`;
+}, { passive: true });
+
+DOM.lightboxOverlay.addEventListener('touchend', (e) => {
+  if (!isDraggingLightbox || DOM.lightboxImage.classList.contains('zoomed')) return;
+  isDraggingLightbox = false;
+  
+  // Release CSS constraints to expose standard easing curves again
+  DOM.lightboxImage.classList.remove('dragging');
+  
+  const deltaY = lbCurrentY - lbTouchStartY;
+  const threshold = window.innerHeight * 0.15; // Requires minimum 15% displacement
+  
+  if (deltaY < -threshold) {
+    // Flicked Up -> Next Slide
+    executeSwipeAnimation(-1); 
+  } else if (deltaY > threshold) {
+    // Flicked Down -> Prev Slide
+    executeSwipeAnimation(1); 
+  } else {
+    // Aborted: Elastic Rubberband seamlessly snaps to center baseline visually
+    DOM.lightboxImage.style.transform = `translateY(0)`;
+    DOM.lightboxOverlay.style.background = `var(--color-bg)`;
+  }
+}, { passive: true });
+
+function executeSwipeAnimation(direction) {
+  // Fire offscreen completely aligning perfectly sequentially mapped to the exact velocity vector
+  const targetOffset = direction * window.innerHeight;
+  DOM.lightboxImage.style.transform = `translateY(${targetOffset}px)`;
+  DOM.lightboxImage.style.opacity = '0';
+  
+  setTimeout(() => {
+    // Cycle the source seamlessly inside the hidden layer
+    changeLightboxImage(-direction); // Direction matches mathematical arrays mapped backwards natively
+    
+    // Teleport image to the exact opposite bounds instantaneously securely
+    DOM.lightboxImage.classList.add('dragging');
+    DOM.lightboxImage.style.transform = `translateY(${-targetOffset}px)`;
+    
+    setTimeout(() => {
+      // Physically Release bounding mappings resolving the visual loop intuitively
+      DOM.lightboxImage.classList.remove('dragging');
+      DOM.lightboxImage.style.transform = `translateY(0px)`;
+      DOM.lightboxImage.style.opacity = '1';
+      DOM.lightboxOverlay.style.background = `var(--color-bg)`;
+    }, 20); // Paint-render loop synchronization timer natively
+  }, 300); // Expiration interval matching our explicit CSS Cubic-Bezier animation limit natively
+}
+
+// Desktop Keyboard Fallback
+window.addEventListener('keydown', (e) => {
+  if (!isLightboxActive) return;
+  if (e.key === 'ArrowRight') changeLightboxImage(1);
+  if (e.key === 'ArrowLeft') changeLightboxImage(-1);
+  if (e.key === 'Escape') closeLightbox();
 });
