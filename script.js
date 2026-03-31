@@ -218,6 +218,24 @@ bioContainer.addEventListener('click', () => {
   }
 });
 
+// --- Copy Email Module ---
+const copyBtn = document.getElementById('copy-email-btn');
+const copyMsg = document.getElementById('copy-msg');
+
+if (copyBtn && copyMsg) {
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText('daechankim.design@gmail.com').then(() => {
+      copyMsg.style.opacity = '0.7'; // Expose feedback loop
+      setTimeout(() => {
+        copyMsg.style.opacity = '0'; // Disappear natively
+      }, 2000);
+    });
+  });
+  
+  copyBtn.addEventListener('mouseenter', () => copyBtn.style.opacity = '1');
+  copyBtn.addEventListener('mouseleave', () => copyBtn.style.opacity = '0.3');
+}
+
 // --- Dynamic Scrollytelling Engine ---
 
 function handleTabHop(direction) {
